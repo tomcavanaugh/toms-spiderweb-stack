@@ -16,6 +16,8 @@ class TomsSpiderwebStackStack(cdk.Stack):
             handler='hello.handler',
         )
         
+        
+        
         apigw.LambdaRestApi(
             self, 'Endpoint',
             handler=my_lambda,
