@@ -25,12 +25,35 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+       
+    # Install Cdk
+      - name: Install cdk
+        run: npm install aws-cdk
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+    # Install all needed packages
+      - name: Install dependencies
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+    # Synthesize infrastructure template
+      - name: Synthesize infrastructure
+        run: ./node_modules/aws-cdk/bin/cdk synth
+
+
+     # Set credentials from GitHub secret store to used by aws cli commands
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+
+    # Synthesize infrastructure template
+      - name: Synthesize infrastructure
+        run: ./node_modules/aws-cdk/bin/cdk deploy --require-approval never
